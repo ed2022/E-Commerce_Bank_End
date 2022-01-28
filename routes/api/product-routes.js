@@ -1,35 +1,42 @@
 const router = require('express').Router();
-const { Product, ProductTag } = require('../../models');
+const { Product, ProductTag, Category, Tag} = require('../../models');
 
 // The `/api/products` endpoint
+//syntax from mini-project however error promted me to remove the const productData = await--> it wasn't liking it
 
 // get all products
 router.get('/', (req, res) => {
   // find all products
   // be sure to include its associated Category and Tag data
   try {
-    const tagData = await Product.findAll({
-      include: [{ model: Product, through: ProductTag, as: 'product_tags' }]
+    Product.findAll({
+      include: [
+        {model: Category,attributes: ['category_name']},
+        {model: Tag, attributes: ['tag_name']}
+      ],
+      attributes:['id','product_name', 'price', 'stock']
     });
-    res.status(200).json(tagData);
+    res.status(200).json(productData);
   } catch (err) {
     res.status(500).json(err);
   }
 });
 // get one product
 router.get('/:id', (req, res) => {
-  // find a single product by its `id`
-  // be sure to include its associated Category and Tag data
-    // find all tags // be sure to include its associated Product data
-    try {
-      const tagData = await Product.findByPk(req.params.id, {
-        include: [{ model: Product, through: ProductTag, as: 'tag_product' }]
+    try { // find a single product by its `id`
+      Product.findByPk(req.params.id, {
+        // be sure to include its associated Category and Tag data
+        include: [
+          {model: Category,attributes: ['category_name']},
+          {model: Tag, attributes: ['tag_name']}
+        ],
+        attributes:['id','product_name', 'price', 'stock']
       });
-      if (!tagData) {
-        res.status(404).json({ message: 'No tag found with this id!' });
+      if (!productData) {
+        res.status(404).json({ message: 'No product found with this id!' });
         return;
       }
-      res.status(200).json(tagData);
+      res.status(200).json(productData);
     } catch (err) {
       res.status(500).json(err);
     }
@@ -108,18 +115,13 @@ router.put('/:id', (req, res) => {
 });
 // delete one product by its `id` value
 router.delete('/:id', (req, res) => {
-  
   try {
-    const tagData = await Product.destroy({
-      where: {
-        id: req.params.id
-      }
-    });
-    if (!tagData) {
-      res.status(404).json({ message: 'No tag found with this id!' });
+    Product.destroy({where: {id: req.params.id}});
+    if (!productData) {
+      res.status(404).json({ message: 'No product found with this id!' });
       return;
     }
-    res.status(200).json(tagData);
+    res.status(200).json(productData);
   } catch (err) {
     res.status(500).json(err);
   }

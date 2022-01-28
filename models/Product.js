@@ -22,16 +22,18 @@ Product.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    //price DECIMAL NOT NULL,
+    //price DECIMAL NOT NULL,Validates that the value is a decimal.
     price: {
       type: DataTypes.DECIMAL,
       allowNull: false,
+      validate: {isDecimal: true}
     },
-    //stock INT NOT NULL DEFAULT 10
+    //stock INT NOT NULL DEFAULT 10, Validates that the value is numeric.
     stock: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 10,
+      validate: {isNumeric: true}
     },
     //category_id INT, FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE SET NULL
     category_id: {

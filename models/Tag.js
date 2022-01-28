@@ -16,7 +16,6 @@ Tag.init(
     // tag_name VARCHAR(100)
     tag_name: {
       type: DataTypes.STRING,
-      allowNull: false,
     }
   },
   {

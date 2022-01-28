@@ -1,28 +1,32 @@
 const router = require('express').Router();
 const { Category, Product } = require('../../models');
 
-// The `/api/categories` endpoint
+// The `/api/categories` endpoint-
+//syntax from mini-project however error promted me to remove the const categoryData = await--> it wasn't liking it 
 
 router.get('/', (req, res) => {
-  // find all categories
-  // be sure to include its associated Products
+  // find all categories- this is using the findAll()- which happens to be a model query
   try {
-    const categoryData = await Category.findAll();
+    Category.findAll({
+      // be sure to include its associated Products
+      include: [{ model: Product, attributes: ['id', 'product_name', 'price', 'stock', 'category_id']}]
+    })
     res.status(200).json(categoryData);
-  } catch (err) {
+  }
+  catch (err) {
     res.status(500).json(err);
   }
 });
 
 router.get('/:id', (req, res) => {
   // find one category by its `id` value
-  // be sure to include its associated Products
   try {
-    const categoryData = await Category.findByPk(req.params.id, {
-      include: [{ model: Product, as: 'product-category' }]
+    Category.findOne(req.params.id, { 
+      // be sure to include its associated Products
+      include: [{ model: Product, attributes: ['id', 'product_name', 'price', 'stock', 'category_id']}]
     });
     if (!categoryData) {
-      res.status(404).json({ message: 'No location found with this id!' });
+      res.status(404).json({ message: 'No category found with this id!' });
       return;
     }
     res.status(200).json(categoryData);
@@ -34,27 +38,32 @@ router.get('/:id', (req, res) => {
 router.post('/', (req, res) => {
   // create a new category
   try {
-    const categoryData = await Category.create(req.body);
+    Category.create({category_name: req.body.category_name});
     res.status(200).json(categoryData);
   } catch (err) {
-    res.status(400).json(err);
+    res.status(500).json(err);
   }
 });
 
 router.put('/:id', (req, res) => {
   // update a category by its `id` value
-  
+  try {
+    Category.update({category_name: req.body.category_name}, {where: {id: req.params.id}}); //name within the body is what we are updating by requiring the id 
+    if (!categoryData) {
+      res.status(404).json({ message: 'No category found with this id!' });
+      return;
+    }
+    res.status(200).json(categoryData);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+
 });
 
 router.delete('/:id', (req, res) => {
   // delete a category by its `id` value
   try {
-    const categoryData = await Category.destroy({
-      where: {
-        id: req.params.id
-      }
-    });
-
+    Category.destroy({where: {id: req.params.id}});
     if (!categoryData) {
       res.status(404).json({ message: 'No category found with this id!' });
       return;
